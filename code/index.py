@@ -4,12 +4,13 @@ import time
 import board
 import digitalio
 
+from tilt import getTiltPos
+from chime import chime
+from reading_light import reading_light
+from weather import weather_light
 
 import neopixel
 
-
-tilt_pin = digitalio.DigitalInOut(board.GP10)
-tilt_pin.direction = digitalio.Direction.INPUT
 
 # Update this to match the number of NeoPixel LEDs connected to your board.
 num_pixels = 26
@@ -35,17 +36,31 @@ if False:   # change to True if you want to write the time!
     rtc.datetime = t
     print() 
     
+prev_min = 0
+prev_hour = 0
 while True:
     t = rtc.datetime
     #print(t)     # uncomment for debugging
 
-    print("The date is %s %d/%d/%d" % (days[t.tm_wday], t.tm_mday, t.tm_mon, t.tm_year))
+    #print("The date is %s %d/%d/%d" % (days[t.tm_wday], t.tm_mday, t.tm_mon, t.tm_year))
     print("The time is %d:%02d:%02d" % (t.tm_hour, t.tm_min, t.tm_sec))
     
-    print(tilt_pin.value)
-    if tilt_pin.value:
-        color = (255,0,0)
+    is_vertical = getTiltPos()
+    #getTiltPos returns true if tilt sensor is active (i.e. loop lamp is vertical)
+    if(is_vertical):
+        chime_amount = 3
+        if(prev_hour != t.tm_hour):
+            chime_amount = t.tm_hour % 12
+        print("chime_amount", chime_amount)
+        weather_light(pixels)
+        chime(pixels, t.tm_min % 30 == 0, chime_amount)
     else:
-        color = (255,255,255)
-    pixels.fill(color)
-    time.sleep(1) # wait a second
+        reading_light(pixels)
+    
+    prev_min = t.tm_min
+    prev_hour = t.tm_hour
+    time.sleep(1)
+        
+    
+        
+    
