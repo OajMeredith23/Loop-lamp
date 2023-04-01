@@ -1,3 +1,3 @@
 
-def reading_light(pixels):
-    pixels.fill((255, 200, 134))
+def reading_light():
+    return (255, 200, 134)
