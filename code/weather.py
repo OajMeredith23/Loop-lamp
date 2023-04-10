@@ -26,7 +26,7 @@ requests = adafruit_requests.Session(pool, ssl.create_default_context())
 
 def get_weather():
     #  pings openweather
-    
+    print("fetching weather...")
     response = requests.get(url)
     #  packs the response into a JSON
     response_as_json = response.json()
